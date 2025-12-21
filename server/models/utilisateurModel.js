@@ -55,7 +55,6 @@ const SchemaUtilisateur = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const mongoosePagination = require('mongoose-paginate-v2');
 SchemaUtilisateur.plugin(mongoosePagination);
 const utilisateurModel = mongoose.model('Utilisateur', SchemaUtilisateur);
 module.exports = utilisateurModel;

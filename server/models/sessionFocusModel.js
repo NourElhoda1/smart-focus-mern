@@ -39,7 +39,6 @@ const SchemaSessionFocus = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const mongoosePagination = require('mongoose-paginate-v2');
 SchemaSessionFocus.plugin(mongoosePagination);
 const sessionFocusModel = mongoose.model('SessionFocus', SchemaSessionFocus);
 module.exports = sessionFocusModel;
