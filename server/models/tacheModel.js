@@ -44,7 +44,6 @@ const SchemaTache = new mongoose.Schema({
   timestamps: true 
 });
 
-const mongoosePagination = require('mongoose-paginate-v2');
 SchemaTache.plugin(mongoosePagination);
 const tacheModel = mongoose.model('Tache', SchemaTache);
 module.exports = tacheModel;
