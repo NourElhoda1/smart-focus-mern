@@ -12,12 +12,14 @@ dotenv.config();
 connecterDB();
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173' 
+}));
 
 //! Routes
 app.get('/', (req, res) => { res.send('API Smart Focus fonctionne !')});
 app.use('/v1',tacheRouter);
-app.use('/v1', utilisateurRouter);
+app.use('/v1/utilisateur', utilisateurRouter);
 app.use('/v1', sessionRouter);
 
 //! Error handling middleware

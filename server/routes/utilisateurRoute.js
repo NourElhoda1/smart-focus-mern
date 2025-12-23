@@ -4,12 +4,12 @@ const utilisateurController = require('../controllers/utilisateurController');
 const { proteger } = require('../middlewares/authMiddleware');
 
 //! Inscription d'un nouvel utilisateur
-utilisateurRouter.post('/utilisateur/inscription', utilisateurController.inscription);
+utilisateurRouter.post('/inscription', utilisateurController.inscription);
 
 //! Connexion d'un utilisateur
-utilisateurRouter.post('/utilisateur/connexion', utilisateurController.connexion);
+utilisateurRouter.post('/connexion', utilisateurController.connexion);
 
 //! Obtenir le profil utilisateur
-utilisateurRouter.get('/utilisateur/profil', proteger, utilisateurController.obtenirProfil);
+utilisateurRouter.get('/profil', proteger, utilisateurController.obtenirProfil);
 
 module.exports = utilisateurRouter;
