@@ -6,6 +6,7 @@ import {
     CheckSquare, 
     Settings, 
     Clock,
+    StickyNote,
     LogOut, 
     Menu, 
     X, 
@@ -22,6 +23,7 @@ const SidebarLayout = ({ children }) => {
         { path: '/tableau-de-bord', label: 'Tableau de bord', icon: LayoutDashboard },
         { path: '/taches', label: 'Mes Tâches', icon: CheckSquare },
         { path: '/focus', label: 'Focus', icon: Clock },
+        { path: '/notes', label: 'Bloc-notes', icon: StickyNote },
         { path: '/parametres', label: 'Paramètres', icon: Settings },
     ];
 

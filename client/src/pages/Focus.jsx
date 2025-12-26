@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import SidebarLayout from '../layout/SidebarLayout';
 import Pomodoro from '../components/Pomodoro'; 
+import { Music } from 'lucide-react';
+import MusicPlayer from '../components/MusicPlayer';
 
 
 const Focus = () => {
@@ -31,6 +33,7 @@ const Focus = () => {
                 <p className="text-gray-500 italic mb-10">"{citation}"</p>
                 <Pomodoro />
             </div>
+            <MusicPlayer />
         </SidebarLayout>
     );
 };
