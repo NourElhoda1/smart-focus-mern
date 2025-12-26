@@ -6,6 +6,7 @@ import Inscription from '../src/pages/Inscription';
 import TableauDeBord from '../src/pages/TableauDeBord'; 
 import Focus from '../src/pages/Focus';
 import Taches from '../src/pages/Tache';
+import BlocNotes from './pages/BlocNotes';
 
 function App() {
     return (
@@ -22,6 +23,7 @@ function App() {
                         <Route path="/tableau-de-bord" element={<TableauDeBord />} /> 
                         <Route path="/focus" element={<Focus />} />
                         <Route path="/taches" element={<Taches />} />
+                        <Route path="/notes" element={<BlocNotes />} />
                     </Routes>
                 </div>
             </FournisseurAuth>
