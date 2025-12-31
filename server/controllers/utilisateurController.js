@@ -94,3 +94,46 @@ exports.obtenirProfil = async (req, res) => {
     res.status(500).json({ message: erreur.message });
   }
 };
+
+// AJOUTER CETTE FONCTION : Mettre à jour le profil
+exports.mettreAJourProfil = async (req, res) => {
+  try {
+    const utilisateur = await Utilisateur.findById(req.user._id);
+
+    if (utilisateur) {
+      // 1. Mise à jour des champs simples
+      utilisateur.nom = req.body.nom || utilisateur.nom;
+      utilisateur.email = req.body.email || utilisateur.email;
+
+      // 2. Mise à jour du mot de passe (seulement si envoyé)
+      if (req.body.motDePasse) {
+        const salt = await bcrypt.genSalt(10);
+        utilisateur.motDePasse = await bcrypt.hash(req.body.motDePasse, salt);
+      }
+
+      // 3. Mise à jour des préférences
+      if (req.body.preferences) {
+        utilisateur.preferences = {
+            ...utilisateur.preferences, // Garde les anciennes prefs
+            ...req.body.preferences     // Écrase avec les nouvelles
+        };
+      }
+
+      const utilisateurMisAJour = await utilisateur.save();
+
+      // On renvoie les nouvelles infos + un nouveau token (sécurité)
+      res.json({
+        _id: utilisateurMisAJour._id,
+        nom: utilisateurMisAJour.nom,
+        email: utilisateurMisAJour.email,
+        preferences: utilisateurMisAJour.preferences,
+        statistiques: utilisateurMisAJour.statistiques,
+        token: genererToken(utilisateurMisAJour._id),
+      });
+    } else {
+      res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+  } catch (erreur) {
+    res.status(500).json({ message: erreur.message });
+  }
+};

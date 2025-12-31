@@ -89,3 +89,44 @@ exports.obtenirHistorique = async (req, res) => {
     res.status(500).json({ message: erreur.message });
   }
 };
+
+// Sauvegarder une session terminée (Utilisé par le Pomodoro)
+exports.sauvegarderSession = async (req, res) => {
+  try {
+    const { dureeEnMinutes } = req.body;
+    const statusCalcule = dureeEnMinutes >= 25 ? 'termine' : 'interrompu';
+
+    const nouvelleSession = await SessionFocus.create({
+      utilisateur: req.user._id,
+      dureeEnMinutes : dureeEnMinutes,
+      heureDebut: new Date(Date.now() - dureeEnMinutes * 60000),
+      heureFin: Date.now(),
+      statut: statusCalcule,
+      niveauConcentration: 5,
+    });
+
+    res.status(201).json(nouvelleSession);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Calculer le temps total de concentration pour l'utilisateur
+exports.obtenirStats = async (req, res) => {
+  try {
+    // On cherche toutes les sessions terminées ou interrompues de l'utilisateur
+    const sessions = await SessionFocus.find({ utilisateur: req.user._id });
+    
+    // On additionne les durées
+    const totalMinutes = sessions.reduce((acc, session) => acc + (session.dureeEnMinutes || 0), 0);
+    
+    const sessionsTerminees = sessions.filter(session => session.statut === 'termine').length;
+    // On renvoie aussi le nombre de sessions
+    res.json({
+      totalMinutes,
+      nombreSessions: sessionsTerminees
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

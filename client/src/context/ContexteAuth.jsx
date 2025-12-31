@@ -60,6 +60,27 @@ export const FournisseurAuth = ({ children }) => {
         naviguer('/connexion'); 
     };
 
+    //! Mettre à jour le profil
+    const mettreAJourUser = async (donnees) => {
+        try {
+            const config = { headers: { Authorization: `Bearer ${jeton}` } };
+            // On envoie les données (nom, email, motDePasse, preferences)
+            const { data } = await axios.put('/utilisateur/profil', donnees, config);
+            
+            // On met à jour le localStorage et l'état
+            localStorage.setItem('token', data.token);
+            setJeton(data.token);
+            setUtilisateur(data); // L'interface se mettra à jour instantanément
+            return { succes: true };
+        } catch (erreur) {
+            console.error(erreur);
+            return { 
+                succes: false, 
+                message: erreur.response?.data?.message || "Erreur de mise à jour" 
+            };
+        }
+    };
+
     return (
         <ContexteAuth.Provider value={{ 
             utilisateur, 
@@ -67,7 +88,8 @@ export const FournisseurAuth = ({ children }) => {
             seConnecter, 
             sInscrire, 
             seDeconnecter, 
-            chargement 
+            chargement,
+            mettreAJourUser // <-- N'oublie pas de l'exporter ici !
         }}>
             {children}
         </ContexteAuth.Provider>
