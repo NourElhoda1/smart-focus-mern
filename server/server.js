@@ -6,6 +6,7 @@ const connecterDB = require('./config/connecterDB');
 const tacheRouter = require('./routes/tacheRoute');
 const utilisateurRouter = require('./routes/utilisateurRoute');
 const sessionRouter = require('./routes/sessionRoute');
+const noteRouter = require('./routes/noteRoute');
 
 
 dotenv.config();
@@ -21,6 +22,7 @@ app.get('/', (req, res) => { res.send('API Smart Focus fonctionne !')});
 app.use('/v1',tacheRouter);
 app.use('/v1/utilisateur', utilisateurRouter);
 app.use('/v1', sessionRouter);
+app.use('/v1/notes', noteRouter);
 
 //! Error handling middleware
 app.use((err, req, res, next) => {
