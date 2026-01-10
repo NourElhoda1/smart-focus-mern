@@ -18,17 +18,13 @@ exports.inscription = async (req, res) => {
       return res.status(400).json({ message: "Merci de remplir tous les champs" });
     }
 
-    // Vérifier si l'utilisateur existe déjà
     const utilisateurExiste = await Utilisateur.findOne({ email });
     if (utilisateurExiste) {
       return res.status(400).json({ message: "Cet email est déjà utilisé" });
     }
 
-    // Hasher le mot de passe 
     const salt = await bcrypt.genSalt(10);
     const motDePasseHash = await bcrypt.hash(motDePasse, salt);
-
-    // Créer l'utilisateur
     const utilisateur = await Utilisateur.create({
       nom,
       email,
@@ -54,11 +50,8 @@ exports.inscription = async (req, res) => {
 exports.connexion = async (req, res) => {
   try {
     const { email, motDePasse } = req.body;
-
-    // Vérifier l'email
     const utilisateur = await Utilisateur.findOne({ email });
 
-    // Vérifier le mot de passe
     if (utilisateur && (await bcrypt.compare(motDePasse, utilisateur.motDePasse))) {
       res.json({
         _id: utilisateur.id,
@@ -95,33 +88,29 @@ exports.obtenirProfil = async (req, res) => {
   }
 };
 
-// AJOUTER CETTE FONCTION : Mettre à jour le profil
+//! Mettre à jour le profil
 exports.mettreAJourProfil = async (req, res) => {
   try {
     const utilisateur = await Utilisateur.findById(req.user._id);
 
     if (utilisateur) {
-      // 1. Mise à jour des champs simples
       utilisateur.nom = req.body.nom || utilisateur.nom;
       utilisateur.email = req.body.email || utilisateur.email;
 
-      // 2. Mise à jour du mot de passe (seulement si envoyé)
       if (req.body.motDePasse) {
         const salt = await bcrypt.genSalt(10);
         utilisateur.motDePasse = await bcrypt.hash(req.body.motDePasse, salt);
       }
 
-      // 3. Mise à jour des préférences
       if (req.body.preferences) {
         utilisateur.preferences = {
-            ...utilisateur.preferences, // Garde les anciennes prefs
-            ...req.body.preferences     // Écrase avec les nouvelles
+            ...utilisateur.preferences, 
+            ...req.body.preferences     
         };
       }
 
       const utilisateurMisAJour = await utilisateur.save();
 
-      // On renvoie les nouvelles infos + un nouveau token (sécurité)
       res.json({
         _id: utilisateurMisAJour._id,
         nom: utilisateurMisAJour.nom,

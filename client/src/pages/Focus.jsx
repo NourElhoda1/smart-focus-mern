@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import SidebarLayout from '../layout/SidebarLayout';
 import Pomodoro from '../components/Pomodoro'; 
-import { Music } from 'lucide-react';
 import MusicPlayer from '../components/MusicPlayer';
-
+import useTheme from '../hooks/useTheme';
 
 const Focus = () => {
     const [citation, setCitation] = useState("");
+    const { theme, darkMode } = useTheme();
 
     useEffect(() => {
         const citations = [
@@ -21,18 +21,31 @@ const Focus = () => {
     return (
         <SidebarLayout>
             <div 
-                className="fixed inset-0 z-0 opacity-40 pointer-events-none"
+                className="fixed inset-0 z-0 pointer-events-none"
                 style={{
                     backgroundImage: "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2673&auto=format&fit=crop')",
-                    backgroundSize: 'cover'
+                    backgroundSize: 'cover',
+                    opacity: darkMode ? 0.2 : 0.4
                 }}
             ></div>
 
             <div className="relative z-10 flex flex-col items-center justify-center min-h-[80vh]">
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">Mode Focus</h2>
-                <p className="text-gray-500 italic mb-10">"{citation}"</p>
+                <h2 
+                    className="text-3xl font-bold mb-2 transition-colors"
+                    style={{ color: theme.text }}
+                >
+                    Mode Focus
+                </h2>
+                <p 
+                    className="italic mb-10 transition-colors"
+                    style={{ color: theme.textSecondary }}
+                >
+                    "{citation}"
+                </p>
+                
                 <Pomodoro />
             </div>
+            
             <MusicPlayer />
         </SidebarLayout>
     );

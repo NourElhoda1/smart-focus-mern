@@ -7,6 +7,7 @@ const tacheRouter = require('./routes/tacheRoute');
 const utilisateurRouter = require('./routes/utilisateurRoute');
 const sessionRouter = require('./routes/sessionRoute');
 const noteRouter = require('./routes/noteRoute');
+const evenementRoute = require('./routes/evenementRoute');
 
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use('/v1',tacheRouter);
 app.use('/v1/utilisateur', utilisateurRouter);
 app.use('/v1', sessionRouter);
 app.use('/v1/notes', noteRouter);
+app.use('/v1/evenements', evenementRoute);
 
 //! Error handling middleware
 app.use((err, req, res, next) => {

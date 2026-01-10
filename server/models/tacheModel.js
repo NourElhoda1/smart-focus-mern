@@ -15,7 +15,6 @@ const SchemaTache = new mongoose.Schema({
   description: {
     type: String,
   },
-  // Intelligence 
   estUrgent: {
     type: Boolean,
     default: false
@@ -27,7 +26,6 @@ const SchemaTache = new mongoose.Schema({
   dateLimite: {
     type: Date,
   },
-  // Gestion du Temps 
   tempsEstime: {
     type: Number,
     default: 25

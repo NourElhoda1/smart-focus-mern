@@ -12,7 +12,7 @@ utilisateurRouter.post('/connexion', utilisateurController.connexion);
 //! Obtenir le profil utilisateur
 utilisateurRouter.get('/profil', proteger, utilisateurController.obtenirProfil);
 
-// AJOUTER CETTE LIGNE
+//! Mettre à jour le profil utilisateur
 utilisateurRouter.put('/profil', proteger, utilisateurController.mettreAJourProfil);
 
 module.exports = utilisateurRouter;

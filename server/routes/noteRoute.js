@@ -1,11 +1,18 @@
 const express = require('express');
-const router = express.Router();
+const noteRouter = express.Router();
 const { obtenirNotes, creerNote, modifierNote, supprimerNote } = require('../controllers/noteController');
 const { proteger } = require('../middlewares/authMiddleware');
 
-router.get('/', proteger, obtenirNotes);
-router.post('/', proteger, creerNote);
-router.put('/:id', proteger, modifierNote);
-router.delete('/:id', proteger, supprimerNote);
+//!Recupérer toutes les notes de l'utilisateur
+noteRouter.get('/', proteger, obtenirNotes);
 
-module.exports = router;
+//!Créer une note
+noteRouter.post('/', proteger, creerNote);
+
+//!Modifier une note
+noteRouter.put('/:id', proteger, modifierNote);
+
+//!Supprimer une note
+noteRouter.delete('/:id', proteger, supprimerNote);
+
+module.exports = noteRouter;

@@ -1,6 +1,6 @@
 const Note = require('../models/noteModel');
 
-// Obtenir toutes les notes de l'utilisateur
+//! Obtenir toutes les notes de l'utilisateur
 const obtenirNotes = async (req, res) => {
   try {
     const notes = await Note.find({ utilisateur: req.user._id }).sort({ updatedAt: -1 });
@@ -10,7 +10,7 @@ const obtenirNotes = async (req, res) => {
   }
 };
 
-// Créer une note
+//! Créer une note
 const creerNote = async (req, res) => {
   try {
     const { texte, couleur } = req.body;
@@ -25,7 +25,7 @@ const creerNote = async (req, res) => {
   }
 };
 
-// Mettre à jour une note
+//! Mettre à jour une note
 const modifierNote = async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
@@ -34,7 +34,6 @@ const modifierNote = async (req, res) => {
       return res.status(404).json({ message: 'Note non trouvée' });
     }
 
-    // Vérifier que la note appartient à l'utilisateur
     if (note.utilisateur.toString() !== req.user._id.toString()) {
       return res.status(401).json({ message: 'Non autorisé' });
     }
@@ -50,7 +49,7 @@ const modifierNote = async (req, res) => {
   }
 };
 
-// Supprimer une note
+//! Supprimer une note
 const supprimerNote = async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
