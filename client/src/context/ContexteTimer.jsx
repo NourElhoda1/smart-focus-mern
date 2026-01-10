@@ -5,9 +5,8 @@ import ContexteAuth from './ContexteAuth';
 const ContexteTimer = createContext();
 
 export const FournisseurTimer = ({ children }) => {
-    const { jeton, utilisateur } = useContext(ContexteAuth); // On récupère l'utilisateur
-    
-    // États du Timer
+
+    const { jeton, utilisateur } = useContext(ContexteAuth); 
     const [dureeInitiale, setDureeInitiale] = useState(25);
     const [minutes, setMinutes] = useState(25);
     const [secondes, setSecondes] = useState(0);
@@ -15,27 +14,18 @@ export const FournisseurTimer = ({ children }) => {
     const [mode, setMode] = useState('focus');
     const [sessionSauvegardee, setSessionSauvegardee] = useState(false);
 
-    // --- NOUVEAU : Synchronisation avec les Paramètres Utilisateur ---
     useEffect(() => {
-        // Si l'utilisateur est chargé et a une préférence de durée
         if (utilisateur && utilisateur.preferences) {
             const dureePreferee = utilisateur.preferences.dureeSessionParDefaut;
             
-            // On met à jour la variable de référence
             setDureeInitiale(dureePreferee);
-
-            // Si le timer est à l'arrêt et qu'on est en mode Focus,
-            // on met à jour l'affichage immédiatement (ex: passage de 25 à 45 min)
             if (!actif && mode === 'focus' && !sessionSauvegardee) {
                 setMinutes(dureePreferee);
                 setSecondes(0);
             }
         }
     }, [utilisateur, actif, mode, sessionSauvegardee]); 
-    // ^ Se déclenche à chaque fois que 'utilisateur' change (donc après sauvegarde des paramètres)
 
-
-    // --- Logique du Compte à rebours ---
     useEffect(() => {
         let interval = null;
 
@@ -44,7 +34,6 @@ export const FournisseurTimer = ({ children }) => {
                 if (secondes === 0) {
                     if (minutes === 0) {
                         setActif(false);
-                        // Fin normale
                         if (mode === 'focus' && !sessionSauvegardee) {
                             sauvegarderSession(dureeInitiale);
                         }
@@ -63,12 +52,9 @@ export const FournisseurTimer = ({ children }) => {
         return () => clearInterval(interval);
     }, [actif, minutes, secondes, mode, sessionSauvegardee, dureeInitiale]);
 
-    // --- Sauvegarde ---
     const sauvegarderSession = async (dureeReelle) => {
         if (!jeton) return;
         
-        // On accepte n'importe quelle durée (même décimale)
-        // Mais pour une session "terminée" valide, on compare à la durée prévue
         const dureePrecise = parseFloat(dureeReelle.toFixed(2));
 
         try {
@@ -112,7 +98,6 @@ export const FournisseurTimer = ({ children }) => {
     const resetTimer = () => {
         setActif(false);
         setSessionSauvegardee(false);
-        // On utilise la nouvelle durée initiale (qui vient des préférences)
         const temps = mode === 'focus' ? dureeInitiale : 5;
         setMinutes(temps);
         setSecondes(0);
@@ -122,9 +107,6 @@ export const FournisseurTimer = ({ children }) => {
         setActif(false);
         setMode(nouveauMode);
         setSessionSauvegardee(false);
-        
-        // Si on passe en Focus, on prend la durée des préférences (dureeInitiale)
-        // Si on passe en Pause, on met 5 min en dur (ou tu pourrais ajouter une pref pour la pause aussi !)
         const temps = nouveauMode === 'focus' ? dureeInitiale : 5;
         
         setMinutes(temps);

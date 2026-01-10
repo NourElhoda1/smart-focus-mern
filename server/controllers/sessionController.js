@@ -1,7 +1,7 @@
 const SessionFocus = require('../models/sessionFocusModel');
 const Utilisateur = require('../models/utilisateurModel');
 
-// Démarrer une session 
+//! Démarrer une session 
 exports.demarrerSession = async (req, res) => {
   try {
     const { tacheId, dureePrevue } = req.body;
@@ -26,7 +26,7 @@ exports.demarrerSession = async (req, res) => {
   }
 };
 
-// Terminer une session 
+//! Terminer une session 
 exports.terminerSession = async (req, res) => {
   try {
     const { statut, nombreDistractions, niveauConcentration } = req.body;
@@ -43,17 +43,12 @@ exports.terminerSession = async (req, res) => {
 
     session.heureFin = new Date();
     const dureeReelle = Math.round((session.heureFin - session.heureDebut) / 60000); 
-
-    // Mise à jour de la session
     session.dureeEnMinutes = dureeReelle > 0 ? dureeReelle : 1; 
     session.statut = statut || 'termine';
     session.nombreDistractions = nombreDistractions || 0;
     session.niveauConcentration = niveauConcentration; 
 
     await session.save();
-
-    // --- PARTIE INTELLIGENTE : MISE À JOUR DU PROFIL UTILISATEUR ---
-    // On ajoute le temps travaillé aux stats globales de l'utilisateur
     if (statut === 'termine') {
       await Utilisateur.findByIdAndUpdate(req.user._id, {
         $inc: { 
@@ -74,7 +69,7 @@ exports.terminerSession = async (req, res) => {
   }
 };
 
-// Obtenir l'historique 
+//! Obtenir l'historique 
 exports.obtenirHistorique = async (req, res) => {
   try {
     const sessions = await SessionFocus.find({ utilisateur: req.user._id })
@@ -90,7 +85,7 @@ exports.obtenirHistorique = async (req, res) => {
   }
 };
 
-// Sauvegarder une session terminée (Utilisé par le Pomodoro)
+//! Sauvegarder une session 
 exports.sauvegarderSession = async (req, res) => {
   try {
     const { dureeEnMinutes } = req.body;
@@ -111,17 +106,11 @@ exports.sauvegarderSession = async (req, res) => {
   }
 };
 
-// Calculer le temps total de concentration pour l'utilisateur
 exports.obtenirStats = async (req, res) => {
   try {
-    // On cherche toutes les sessions terminées ou interrompues de l'utilisateur
     const sessions = await SessionFocus.find({ utilisateur: req.user._id });
-    
-    // On additionne les durées
     const totalMinutes = sessions.reduce((acc, session) => acc + (session.dureeEnMinutes || 0), 0);
-    
     const sessionsTerminees = sessions.filter(session => session.statut === 'termine').length;
-    // On renvoie aussi le nombre de sessions
     res.json({
       totalMinutes,
       nombreSessions: sessionsTerminees

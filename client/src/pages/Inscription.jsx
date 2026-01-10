@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import ContexteAuth from '../context/ContexteAuth';
-import registerImage from '../assets/login1.png'; 
+import registerImage from '../assets/login3.png'; 
 import { Eye, EyeOff } from 'lucide-react';
 
 const Inscription = () => {

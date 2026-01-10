@@ -3,9 +3,11 @@ import SidebarLayout from '../layout/SidebarLayout';
 import { Plus, Trash2, StickyNote } from 'lucide-react';
 import axios from '../api/axios';
 import ContexteAuth from '../context/ContexteAuth';
+import useTheme from '../hooks/useTheme';
 
 const BlocNotes = () => {
     const { jeton } = useContext(ContexteAuth);
+    const { theme, darkMode, colorTheme } = useTheme();
     const [notes, setNotes] = useState([]);
 
     const couleurs = [
@@ -16,10 +18,8 @@ const BlocNotes = () => {
         "bg-purple-100 border-purple-200"
     ];
 
-    // Configuration du header avec le token
     const config = { headers: { Authorization: `Bearer ${jeton}` } };
 
-    // 1. Charger les notes depuis la DB
     useEffect(() => {
         const fetchNotes = async () => {
             if (!jeton) return;
@@ -33,7 +33,6 @@ const BlocNotes = () => {
         fetchNotes();
     }, [jeton]);
 
-    // 2. Ajouter une note
     const ajouterNote = async () => {
         try {
             const couleurAleatoire = couleurs[Math.floor(Math.random() * couleurs.length)];
@@ -44,12 +43,10 @@ const BlocNotes = () => {
         }
     };
 
-    // 3. Gestion locale du texte (pour que ce soit fluide quand on tape)
     const handleTextChange = (id, newText) => {
         setNotes(notes.map(note => note._id === id ? { ...note, texte: newText } : note));
     };
 
-    // 4. Sauvegarder en DB quand on quitte le champ (onBlur)
     const saveNoteText = async (id, texte) => {
         try {
             await axios.put(`/notes/${id}`, { texte }, config);
@@ -58,7 +55,6 @@ const BlocNotes = () => {
         }
     };
 
-    // 5. Supprimer une note
     const supprimerNote = async (id) => {
         try {
             await axios.delete(`/notes/${id}`, config);
@@ -68,12 +64,9 @@ const BlocNotes = () => {
         }
     };
 
-    // 6. Changer la couleur
     const changerCouleur = async (id, newColor) => {
         try {
-            // Mise à jour optimiste (Interface d'abord)
             setNotes(notes.map(note => note._id === id ? { ...note, couleur: newColor } : note));
-            // Puis sauvegarde DB
             await axios.put(`/notes/${id}`, { couleur: newColor }, config);
         } catch (err) {
             console.error("Erreur changement couleur", err);
@@ -84,17 +77,26 @@ const BlocNotes = () => {
         <SidebarLayout>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                        <StickyNote className="text-yellow-500" size={32} />
-                        Bloc-notes 📝
+                    <h1 className="text-3xl font-bold flex items-center gap-2" style={{ color: theme.text }}>
+                        <StickyNote style={{ color: colorTheme.primary }} size={32} />
+                        Bloc-notes 
                     </h1>
-                    <p className="text-gray-500">Tes idées synchronisées dans le cloud.</p>
+                    <p style={{ color: theme.textSecondary }}>
+                        Tes idées synchronisées dans le cloud.
+                    </p>
                 </div>
                 <button 
                     onClick={ajouterNote}
-                    className="bg-green-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-green-700 transition-colors shadow-lg shadow-green-500/30">
+                    className="text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-lg"
+                    style={{ 
+                        backgroundColor: colorTheme.primary,
+                        boxShadow: `0 4px 14px ${colorTheme.primary}30`
+                    }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = colorTheme.hover}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = colorTheme.primary}
+                >
                     <Plus size={20} />
-                    Ajouter
+                    Nouvelle Note
                 </button>
             </div>
 
@@ -103,13 +105,15 @@ const BlocNotes = () => {
                     <div 
                         key={note._id} 
                         className={`p-5 rounded-2xl shadow-sm border ${note.couleur} transition-all hover:shadow-md hover:-translate-y-1 group relative flex flex-col h-64`}
+                        style={{ color: '#1f2937' }} 
                     >
                         <textarea
-                            className="w-full h-full bg-transparent border-none outline-none resize-none text-gray-700 font-medium text-lg placeholder-gray-400/70 leading-relaxed"
+                            className="w-full h-full bg-transparent border-none outline-none resize-none font-medium text-lg placeholder-gray-500/50 leading-relaxed"
                             placeholder="Écris quelque chose..."
                             value={note.texte}
                             onChange={(e) => handleTextChange(note._id, e.target.value)}
                             onBlur={(e) => saveNoteText(note._id, e.target.value)}
+                            style={{ color: '#1f2937' }}
                         ></textarea>
 
                         <div className="flex justify-between items-center mt-4 pt-2 border-t border-black/5 opacity-80">
@@ -123,13 +127,13 @@ const BlocNotes = () => {
                                         <button 
                                             key={index}
                                             onClick={() => changerCouleur(note._id, c)}
-                                            className={`w-4 h-4 rounded-full border border-black/10 ${c.split(' ')[0]}`}
+                                            className={`w-4 h-4 rounded-full border border-black/10 ${c.split(' ')[0]} transition-transform hover:scale-125`}
                                         />
                                     ))}
                                 </div>
                                 <button 
                                     onClick={() => supprimerNote(note._id)}
-                                    className="text-red-400 hover:text-red-600 ml-2"
+                                    className="text-red-400 hover:text-red-600 ml-2 transition-colors"
                                 >
                                     <Trash2 size={18} />
                                 </button>

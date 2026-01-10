@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ContexteAuth from '../context/ContexteAuth';
+import useTheme from '../hooks/useTheme';
 import { 
     LayoutDashboard, 
     CheckSquare, 
@@ -11,16 +12,21 @@ import {
     Menu, 
     X, 
     User,
-    ChevronRight 
+    ChevronRight,
+    Sun,
+    Moon,
+    Calendar
 } from 'lucide-react';
 
 const SidebarLayout = ({ children }) => {
     const { utilisateur, seDeconnecter } = useContext(ContexteAuth);
+    const { theme, darkMode, toggleTheme, colorTheme } = useTheme(); 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const location = useLocation();
 
     const menuItems = [
         { path: '/tableau-de-bord', label: 'Tableau de bord', icon: LayoutDashboard },
+        { path: '/agenda', label: 'Agenda', icon: Calendar },
         { path: '/taches', label: 'Mes Tâches', icon: CheckSquare },
         { path: '/focus', label: 'Focus', icon: Clock },
         { path: '/notes', label: 'Bloc-notes', icon: StickyNote },
@@ -32,31 +38,100 @@ const SidebarLayout = ({ children }) => {
         return (
             <Link
                 to={item.path}
+                style={{ 
+                    color: isActive ? '#fff' : theme.textSecondary,
+                    backgroundColor: isActive ? colorTheme.primary : 'transparent',
+                    boxShadow: isActive ? `0 4px 14px ${colorTheme.primary}30` : 'none'
+                }}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
-                    ${isActive 
-                        ? 'bg-green-600 text-white shadow-lg shadow-green-500/30' 
-                        : 'text-gray-600 hover:bg-green-50 hover:text-green-700'
-                    }`}
+                    ${isActive ? 'text-white' : ''}`}
+                onMouseEnter={(e) => {
+                    if (!isActive) {
+                        e.currentTarget.style.backgroundColor = colorTheme.light; 
+                        e.currentTarget.style.color = colorTheme.primary;
+                    }
+                }}
+                onMouseLeave={(e) => {
+                    if (!isActive) {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = theme.textSecondary;
+                    }
+                }}
             >
-                <item.icon size={20} className={isActive ? 'text-white' : 'text-gray-400 group-hover:text-green-600'} />
+                <item.icon 
+                    size={20} 
+                    style={{ color: isActive ? '#fff' : (darkMode ? theme.textSecondary : '#9ca3af') }}
+                />
                 <span className="font-medium">{item.label}</span>
                 {isActive && <ChevronRight size={16} className="ml-auto opacity-75" />}
             </Link>
         );
     };
 
+    const mainContainerStyle = { 
+        background: theme.background, 
+        color: theme.text, 
+        transition: 'background 0.3s ease, color 0.3s ease' 
+    };
+    
+    const sidebarContainerStyle = { 
+        background: theme.sidebar, 
+        borderColor: theme.cardBorder, 
+        transition: 'background 0.3s ease, border-color 0.3s ease' 
+    };
+    
+    const cardStyle = { 
+        background: darkMode ? theme.cardBg : '#f9fafb', 
+        color: theme.text 
+    };
+
+    const ThemeSwitch = () => (
+        <div 
+            className="flex items-center justify-between px-4 py-3 mb-3 rounded-xl transition-colors cursor-pointer"
+            style={{ background: darkMode ? 'rgba(255,255,255,0.05)' : '#f3f4f6' }}
+            onClick={toggleTheme}
+        >
+            <div className="flex items-center gap-3">
+                {darkMode 
+                    ? <Moon size={18} className="text-purple-400" /> 
+                    : <Sun size={18} className="text-orange-500" />
+                }
+                <span className="text-sm font-medium" style={{ color: theme.text }}>
+                    {darkMode ? 'Mode Nuit' : 'Mode Jour'}
+                </span>
+            </div>
+            
+            <div 
+                className="relative w-10 h-5 rounded-full transition-colors duration-300"
+                style={{ backgroundColor: darkMode ? colorTheme.primary : '#d1d5db' }}
+            >
+                <div 
+                    className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-300 ${darkMode ? 'translate-x-5' : 'translate-x-0'}`}
+                />
+            </div>
+        </div>
+    );
+
     return (
-        <div className="min-h-screen bg-gray-50 flex font-poppins">
+        <div className="min-h-screen flex font-poppins" style={mainContainerStyle}>
             
             {/* --- SIDEBAR DESKTOP --- */}
-            <aside className="hidden md:flex flex-col w-72 bg-white border-r border-gray-100 h-screen fixed left-0 top-0 z-20">
+            <aside 
+                className="hidden md:flex flex-col w-80 border-r h-screen fixed left-0 top-0 z-20"
+                style={sidebarContainerStyle}
+            >
                 {/* Logo */}
                 <div className="p-8 pb-4">
-                    <h1 className="text-2xl font-bold text-green-600 flex items-center gap-2">
-                        <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white text-sm">SF</div>
+                    <h1 className="text-2xl font-bold flex items-center gap-2" style={{ color: colorTheme.primary }}>
+                        <div 
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm"
+                            style={{ backgroundColor: colorTheme.primary }} 
+                        >
+                            SF
+                        </div>
                         Smart Focus
                     </h1>
-                    <p className="text-xs text-gray-400 mt-1 ml-10">Productivité Master</p>
+                    <p className="text-xs mt-1 ml-10" style={{ color: theme.textSecondary }}>Productivité Master</p>
                 </div>
 
                 {/* Navigation */}
@@ -66,18 +141,27 @@ const SidebarLayout = ({ children }) => {
                     ))}
                 </nav>
 
-                {/* Profil & Déconnexion (Bas de page) */}
-                <div className="p-4 border-t border-gray-100">
-                    <div className="bg-gray-50 p-4 rounded-2xl flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold">
+                {/* Profil & Déconnexion */}
+                <div className="p-4 border-t" style={{ borderColor: theme.cardBorder }}>
+                    
+                    <div className="p-4 rounded-2xl flex items-center gap-3 mb-3" style={cardStyle}>
+                        <div 
+                            className="w-10 h-10 rounded-full flex items-center justify-center font-bold"
+                            style={{ 
+                                backgroundColor: colorTheme.light, 
+                                color: colorTheme.primary 
+                            }}
+                        >
                             {utilisateur?.nom?.charAt(0).toUpperCase() || <User size={20}/>}
                         </div>
                         <div className="flex-1 overflow-hidden">
-                            <p className="text-sm font-bold text-gray-800 truncate">{utilisateur?.nom}</p>
-                            <p className="text-xs text-gray-500 truncate">{utilisateur?.email}</p>
+                            <p className="text-sm font-bold truncate" style={{ color: theme.text }}>{utilisateur?.nom}</p>
+                            <p className="text-xs truncate" style={{ color: theme.textSecondary }}>{utilisateur?.email}</p>
                         </div>
                     </div>
                     
+                    <ThemeSwitch />
+
                     <button 
                         onClick={seDeconnecter}
                         className="w-full flex items-center justify-center gap-2 text-red-500 hover:bg-red-50 py-2 rounded-lg transition-colors text-sm font-medium"
@@ -88,17 +172,18 @@ const SidebarLayout = ({ children }) => {
                 </div>
             </aside>
 
-            {/* --- SIDEBAR MOBILE (Overlay) --- */}
+            {/* --- SIDEBAR MOBILE --- */}
             {mobileMenuOpen && (
                 <div className="fixed inset-0 z-50 md:hidden">
-                    {/* Fond sombre */}
                     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}></div>
                     
-                    {/* Menu Glissant */}
-                    <div className="absolute left-0 top-0 bottom-0 w-64 bg-white p-4 shadow-2xl flex flex-col">
+                    <div 
+                        className="absolute left-0 top-0 bottom-0 w-64 p-4 shadow-2xl flex flex-col"
+                        style={sidebarContainerStyle}
+                    >
                         <div className="flex justify-between items-center mb-8">
-                            <h2 className="text-xl font-bold text-green-600">Smart Focus</h2>
-                            <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+                            <h2 className="text-xl font-bold" style={{ color: colorTheme.primary }}>Smart Focus</h2>
+                            <button onClick={() => setMobileMenuOpen(false)} className="p-2 rounded-lg" style={{ color: theme.textSecondary }}>
                                 <X size={24} />
                             </button>
                         </div>
@@ -107,7 +192,12 @@ const SidebarLayout = ({ children }) => {
                                 <NavItem key={item.path} item={item} />
                             ))}
                         </nav>
-                        <button onClick={seDeconnecter} className="flex items-center gap-3 text-red-500 p-4 hover:bg-red-50 rounded-xl mt-auto">
+
+                        <div className="mt-auto mb-3">
+                            <ThemeSwitch />
+                        </div>
+
+                        <button onClick={seDeconnecter} className="flex items-center gap-3 text-red-500 p-4 hover:bg-red-50 rounded-xl">
                             <LogOut size={20} />
                             <span>Déconnexion</span>
                         </button>
@@ -117,15 +207,16 @@ const SidebarLayout = ({ children }) => {
 
             {/* --- CONTENU PRINCIPAL --- */}
             <main className="flex-1 md:ml-72 transition-all duration-300">
-                {/* Header Mobile */}
-                <header className="md:hidden bg-white p-4 shadow-sm flex justify-between items-center sticky top-0 z-10">
-                    <h1 className="font-bold text-green-600">Smart Focus</h1>
-                    <button onClick={() => setMobileMenuOpen(true)} className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                <header 
+                    className="md:hidden p-4 shadow-sm flex justify-between items-center sticky top-0 z-10"
+                    style={{ background: theme.sidebar }}
+                >
+                    <h1 className="font-bold" style={{ color: colorTheme.primary }}>Smart Focus</h1>
+                    <button onClick={() => setMobileMenuOpen(true)} className="p-2 rounded-lg" style={{ color: theme.text }}>
                         <Menu size={24} />
                     </button>
                 </header>
 
-                {/* Zone de contenu dynamique (C'est là que tes pages s'affichent) */}
                 <div className="p-6 md:p-10 max-w-7xl mx-auto">
                     {children}
                 </div>

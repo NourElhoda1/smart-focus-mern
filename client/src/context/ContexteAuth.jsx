@@ -64,13 +64,11 @@ export const FournisseurAuth = ({ children }) => {
     const mettreAJourUser = async (donnees) => {
         try {
             const config = { headers: { Authorization: `Bearer ${jeton}` } };
-            // On envoie les données (nom, email, motDePasse, preferences)
             const { data } = await axios.put('/utilisateur/profil', donnees, config);
             
-            // On met à jour le localStorage et l'état
             localStorage.setItem('token', data.token);
             setJeton(data.token);
-            setUtilisateur(data); // L'interface se mettra à jour instantanément
+            setUtilisateur(data); 
             return { succes: true };
         } catch (erreur) {
             console.error(erreur);
@@ -89,7 +87,7 @@ export const FournisseurAuth = ({ children }) => {
             sInscrire, 
             seDeconnecter, 
             chargement,
-            mettreAJourUser // <-- N'oublie pas de l'exporter ici !
+            mettreAJourUser 
         }}>
             {children}
         </ContexteAuth.Provider>
